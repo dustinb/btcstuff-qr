@@ -1,0 +1,6 @@
+services:
+  btcstuff-qr:
+    build: .
+    ports:
+      - "8100:8100"
+      - "8101:8101"
