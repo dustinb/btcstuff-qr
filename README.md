@@ -1,3 +1,7 @@
+# Demo
+
+The UI and service is hosted here https://www.btcstuff.io
+
 # Quick Start
 
 Build and run the UI and api

@@ -54,9 +54,8 @@ func main() {
 
 		// TODO: Verify bitcoin address format
 		scheme := "bitcoin:%s?%s"
-		uri := fmt.Sprintf(scheme, r.URL.Query().Get("address"),values.Encode())
-		log.Print(values.Encode())
-		log.Printf(uri)
+		uri := fmt.Sprintf(scheme, r.URL.Query().Get("address"), values.Encode())
+		log.Print(uri)
 
 		var png []byte
 		png, _ = qrcode.Encode(uri, qrcode.Medium, 256)
