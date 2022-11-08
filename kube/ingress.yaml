@@ -29,6 +29,6 @@ spec:
             path: "/"
             backend:
               service:
-                name: qr-api
+                name: qr-ui
                 port:
                   number: 80

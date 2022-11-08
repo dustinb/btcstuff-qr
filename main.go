@@ -9,7 +9,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/skip2/go-qrcode"
 )
 
@@ -23,38 +24,49 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	http.Handle("/", http.FileServer(http.FS(fsys)))
-	go func() {
-		err = http.ListenAndServe(":8101", nil)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
 
-	// https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki
-	router := gin.Default()
-	router.GET("/qr", func(c *gin.Context) {
-		var png []byte
-		scheme := "bitcoin:%s?amount=%f&label=%s&message=%s"
-		amount, err := strconv.ParseFloat(c.Query("amount"), 32)
-		if err != nil {
-			c.AbortWithError(500, err)
+	var requestCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: "btcstuff",
+			Name:      "qr_requests",
+			Help:      "Request counter for /qr endpoint",
+		}, []string{})
+	prometheus.MustRegister(requestCounter)
+	http.Handle("/metrics", promhttp.Handler())
+
+	http.HandleFunc("/qr", func(w http.ResponseWriter, r *http.Request) {
+		requestCounter.WithLabelValues().Inc()
+
+		values := url.Values{}
+		amount := r.URL.Query().Get("amount")
+		if amount != "" {
+			_, err := strconv.ParseFloat(r.URL.Query().Get("amount"), 32)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(err.Error()))
+				return
+			}
+			values.Add("amount", r.URL.Query().Get("amount"))
 		}
-		uri := fmt.Sprintf(
-			scheme,
-			c.Query("address"),
-			amount,
-			url.QueryEscape(c.Query("label")),
-			url.QueryEscape(c.Query("message")),
-		)
+		values.Add("label", r.URL.Query().Get("label"))
+		values.Add("message", r.URL.Query().Get("message"))
+
+		// TODO: Verify bitcoin address format
+		scheme := "bitcoin:%s?%s"
+		uri := fmt.Sprintf(scheme, r.URL.Query().Get("address"),values.Encode())
+		log.Print(values.Encode())
 		log.Printf(uri)
+
+		var png []byte
 		png, _ = qrcode.Encode(uri, qrcode.Medium, 256)
-		c.Data(200, "image/png", png)
+		w.Header().Set("Content-Type", "image/png")
+		w.Write(png)
 	})
 
-	err = router.Run(":8100")
+	err = http.ListenAndServe(":8101", nil)
 	if err != nil {
-		log.Print(err)
+		log.Fatal(err)
 	}
+
 }

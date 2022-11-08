@@ -19,7 +19,7 @@ function QRCode() {
         params.set("label", label.current.value)
         params.set("message", message.current.value)
 
-        let newURL = "http://qr.btcstuff.io/qr?" + params.toString();
+        let newURL = "/qr?" + params.toString();
         setFile(newURL)
     }
 
@@ -28,7 +28,7 @@ function QRCode() {
             <div className="row gy-5">
                 <div className="col p-3">
                 Generate a Bitcoin QR code based
-                    on <a href="https://github.combitcoin/bips/blob/master/bip-0021.mediawiki">BIP 21</a>. Fork me
+                    on <a href="https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki">BIP 21</a>. Fork me
                     on <a href="https://github.com/dustinb/btcstuff-qr">Github</a>
                 </div>
             </div>
@@ -37,21 +37,21 @@ function QRCode() {
                 <form className="input-box">
                     <div className="form-group">
                         <label htmlFor="address">Receive Address</label>
-                        <input ref={address} defaultValue="bc1qkd5az2ml7dk5j5h672yhxmhmxe9tuf97j39fm6" type="text" className="form-control" id="address" aria-describedby="BTC Address" />
+                        <input ref={address} defaultValue="tb1qlmzkqda435e29s5jj74rj9jwrh0myzqw6f752x" type="text" className="form-control" id="address" aria-describedby="BTC Address" />
                     </div>
                     <div className="form-group">
                         <label htmlFor="amount">Amount</label>
-                        <input ref={amount} defaultValue="0.001" type="test" className="form-control" id="amount" aria-describedby="BTC Amount"/>
+                        <input ref={amount} defaultValue="" type="test" className="form-control" id="amount" aria-describedby="BTC Amount"/>
                     </div>
                     <div className="form-group">
                         <label htmlFor="label">Label</label>
-                        <input ref={label} defaultValue="Ukraine Donations" type="text" className="form-control" id="label" aria-describedby="Label" />
+                        <input ref={label} defaultValue="Testnet Address" type="text" className="form-control" id="label" aria-describedby="Label" />
                     </div>
                     <div className="form-group">
                         <label htmlFor="message">Message</label>
-                        <input ref={message} defaultValue="Thanks for your support!!" type="text" className="form-control" id="message" aria-describedby="Message" />
+                        <input ref={message} defaultValue="Send test coins!" type="text" className="form-control" id="message" aria-describedby="Message" />
                     </div>
-                    <button type="submit" className="btn btn-primary" onClick={(e) => loadQR(e)}>Submit</button>
+                    <button type="submit" className="btn btn-primary" onClick={(e) => loadQR(e)}>Generate QR Code</button>
                 </form>
                 </div>
                 <div className="col">
